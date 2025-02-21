@@ -53,20 +53,20 @@ const AnalyticsPage = () => {
   };
 
   return (
-    <div className="p-6 ml-[20%]">
-      <h2 className="text-2xl font-bold text-neon-green mb-4">Analytics</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-lg font-bold mb-2">Time Spent (Last 7 Days)</h3>
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold text-neon-green">Analytics</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        <div className="glass p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-neon-green mb-4">Time Spent (Last 7 Days)</h3>
           <Line data={timeData} options={{ plugins: { legend: { display: false } } }} />
         </div>
-        <div className="bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-lg font-bold mb-2">Time by Category</h3>
-          {tasks.length > 0 ? <Pie data={categoryData} /> : <p className="text-center">No data yet. Start grinding.</p>}
+        <div className="glass p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-neon-green mb-4">Time by Category</h3>
+          {tasks.length > 0 ? <Pie data={categoryData} /> : <p className="text-center text-gray-400">No data yet.</p>}
         </div>
-        <div className="bg-gray-800 p-4 rounded-lg shadow">
-          <h3 className="text-lg font-bold mb-2">Habit Streaks</h3>
-          {habits.length > 0 ? <Bar data={streakData} /> : <p className="text-center">No habits yet.</p>}
+        <div className="glass p-6 shadow-lg">
+          <h3 className="text-lg font-semibold text-neon-green mb-4">Habit Streaks</h3>
+          {habits.length > 0 ? <Bar data={streakData} /> : <p className="text-center text-gray-400">No habits yet.</p>}
         </div>
       </div>
     </div>

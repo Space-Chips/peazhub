@@ -1,9 +1,10 @@
 import React from "react";
-import { createRoot } from "react-dom/client"; // Import createRoot instead of ReactDOM
+import { createRoot } from "react-dom/client"; // Import createRoot instead of render
 import "./index.css";
 import App from "./App";
 
-const root = createRoot(document.getElementById("root")); // Create a root
+const rootElement = document.getElementById("root");
+const root = createRoot(rootElement); // Create a root
 root.render(
   <React.StrictMode>
     <App />

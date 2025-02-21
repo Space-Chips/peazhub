@@ -1,21 +1,44 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 body {
-  font-family: 'Roboto Condensed', sans-serif;
-  background-color: #000;
-  color: #fff; /* Ensure default text is visible */
+  font-family: 'SF Pro Display', sans-serif;
+  background: linear-gradient(to bottom right, #1F2937, #000000);
+  color: #E5E7EB;
 }
 
-.glow-red:hover {
-  box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
-  transition: all 0.3s ease;
+.glass {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.hover-neon-green:hover {
-  color: #10B981;
-  transition: color 0.3s ease;
+.glass-hover:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.3s ease;
+}
+
+.btn-glass {
+  @apply glass glass-hover px-4 py-2 rounded-xl text-gray-200 font-semibold;
+}
+
+.priority-low { @apply bg-green-500/20 text-green-400; }
+.priority-medium { @apply bg-yellow-500/20 text-yellow-400; }
+.priority-high { @apply bg-red-500/20 text-red-400; }
+
+.container {
+  @apply mx-auto px-6 py-8 max-w-7xl;
+}
+
+nav ul {
+  @apply space-y-6;
+}
+
+.grid {
+  @apply gap-6;
 }

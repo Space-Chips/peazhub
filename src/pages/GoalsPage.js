@@ -1,34 +1,50 @@
-import React from "react";
-import QuoteDisplay from "../components/QuoteDisplay";
+import React, { useState } from "react";
 import { useData } from "../context/DataContext";
 
-const Dashboard = () => {
-  const { tasks, habits } = useData();
-  const totalTimeToday = tasks.reduce((sum, task) => sum + (task.timeSpent || 0), 0);
-  const tasksCompleted = tasks.filter((t) => t.completed).length;
-  const maxStreak = habits.reduce((max, h) => Math.max(max, h.streak || 0), 0);
+const GoalsPage = () => {
+  const { goals, setGoals } = useData();
+  const [title, setTitle] = useState("");
+  const [deadline, setDeadline] = useState("");
+
+  const addGoal = () => {
+    if (title && deadline) {
+      setGoals([...goals, { id: Date.now(), title, deadline, completed: false }]);
+      setTitle("");
+      setDeadline("");
+    }
+  };
 
   return (
-    <div className="p-6 ml-[20%]">
-      <QuoteDisplay />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-gray-800 p-4 rounded-lg shadow text-center">
-          <h3 className="text-xl font-bold text-neon-green">Time Today</h3>
-          <p className="text-2xl">
-            {Math.floor(totalTimeToday / 3600)}h {Math.floor((totalTimeToday % 3600) / 60)}m
-          </p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg shadow text-center">
-          <h3 className="text-xl font-bold text-neon-green">Tasks Done</h3>
-          <p className="text-2xl">{tasksCompleted}</p>
-        </div>
-        <div className="bg-gray-800 p-4 rounded-lg shadow text-center">
-          <h3 className="text-xl font-bold text-neon-green">Max Streak</h3>
-          <p className="text-2xl">{maxStreak}</p>
-        </div>
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold text-neon-green">Goals</h2>
+      <div className="glass p-6 shadow-lg flex items-center space-x-4">
+        <input
+          type="text"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Add a goal"
+          className="p-2 bg-transparent border-b border-white/20 text-gray-200 flex-1"
+        />
+        <input
+          type="date"
+          value={deadline}
+          onChange={(e) => setDeadline(e.target.value)}
+          className="p-2 bg-transparent border-b border-white/20 text-gray-200"
+        />
+        <button onClick={addGoal} className="btn-glass bg-red-500/20 text-red-400">
+          Add
+        </button>
+      </div>
+      <div className="space-y-6">
+        {goals.map((goal) => (
+          <div key={goal.id} className="glass p-4 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-200">{goal.title}</h3>
+            <p className="text-sm text-gray-400">Due: {goal.deadline}</p>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-export default Dashboard;
+export default GoalsPage;

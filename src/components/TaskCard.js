@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-const TaskCard = ({ task, updateTask, deleteTask }) => {
+const TaskCard = ({ task, updateTask, deleteTask, startGrindMode }) => {
   const [isRunning, setIsRunning] = useState(false);
   const [timeSpent, setTimeSpent] = useState(task.timeSpent || 0);
 
@@ -19,27 +19,36 @@ const TaskCard = ({ task, updateTask, deleteTask }) => {
   }, [isRunning, task, updateTask]);
 
   return (
-    <div className="bg-gray-800 p-4 rounded-lg shadow flex justify-between items-center">
+    <div className="glass p-4 shadow-lg flex justify-between items-center">
       <div>
-        <h3 className="text-lg font-bold">{task.title}</h3>
-        <span className="text-sm text-blue-500">{task.category}</span>
-        <p className="text-sm">
+        <h3 className="text-lg font-semibold text-gray-200">{task.title}</h3>
+        <div className="flex items-center space-x-2">
+          <span className="text-sm text-blue-400">{task.category}</span>
+          <span className={`text-xs px-2 py-1 rounded-full ${task.priority === "High" ? "priority-high" : task.priority === "Medium" ? "priority-medium" : "priority-low"}`}>
+            {task.priority}
+          </span>
+        </div>
+        <p className="text-sm text-gray-400">
           {Math.floor(timeSpent / 3600)}h {Math.floor((timeSpent % 3600) / 60)}m {timeSpent % 60}s
         </p>
       </div>
-      <div className="space-x-2">
+      <div className="space-x-3">
         <button
           onClick={() => setIsRunning(!isRunning)}
-          className={`p-1 rounded ${isRunning ? "bg-red-500" : "bg-green-500"}`}
+          className={`btn-glass ${isRunning ? "bg-red-500/20 text-red-400" : "bg-green-500/20 text-green-400"}`}
         >
           {isRunning ? "Stop" : "Start"}
         </button>
-        <button onClick={() => deleteTask(task.id)} className="p-1 bg-red-500 rounded">
+        <button onClick={() => startGrindMode(task)} className="btn-glass bg-neon-green/20 text-neon-green">
+          Grind Now
+        </button>
+        <button onClick={() => deleteTask(task.id)} className="btn-glass bg-red-500/20 text-red-400">
           Delete
         </button>
       </div>
     </div>
   );
 };
+
 
 export default TaskCard;

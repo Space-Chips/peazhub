@@ -13,11 +13,19 @@ export const DataProvider = ({ children }) => {
     localStorage.setItem("goals", JSON.stringify(goals));
   }, [tasks, habits, goals]);
 
+  const value = { tasks, setTasks, habits, setHabits, goals, setGoals };
+
   return (
-    <DataContext.Provider value={{ tasks, setTasks, habits, setHabits, goals, setGoals }}>
+    <DataContext.Provider value={value}>
       {children}
     </DataContext.Provider>
   );
 };
 
-export const useData = () => useContext(DataContext);
+export const useData = () => {
+  const context = useContext(DataContext);
+  if (context === undefined) {
+    throw new Error("useData must be used within a DataProvider");
+  }
+  return context;
+};

@@ -30,29 +30,29 @@ const HabitsPage = () => {
   };
 
   return (
-    <div className="p-6 ml-[20%]">
-      <h2 className="text-2xl font-bold text-neon-green mb-4">Habits</h2>
-      <div className="mb-4">
+    <div className="space-y-8">
+      <h2 className="text-2xl font-bold text-neon-green">Habits</h2>
+      <div className="glass p-6 shadow-lg flex items-center space-x-4">
         <input
           type="text"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Add a habit"
-          className="p-2 bg-gray-700 rounded text-white"
+          className="p-2 bg-transparent border-b border-white/20 text-gray-200 flex-1"
         />
-        <button onClick={addHabit} className="ml-2 p-2 bg-red-500 rounded glow-red">
+        <button onClick={addHabit} className="btn-glass bg-red-500/20 text-red-400">
           Add
         </button>
       </div>
-      <div className="space-y-4">
+      <div className="space-y-6">
         {habits.map((habit) => (
-          <div key={habit.id} className="bg-gray-800 p-4 rounded-lg shadow flex justify-between">
+          <div key={habit.id} className="glass p-4 shadow-lg flex justify-between items-center">
             <div>
-              <h3 className="text-lg font-bold">{habit.title}</h3>
-              <p className="text-sm">Streak: {habit.streak}</p>
+              <h3 className="text-lg font-semibold text-gray-200">{habit.title}</h3>
+              <p className="text-sm text-gray-400">Streak: {habit.streak}</p>
             </div>
-            <button onClick={() => toggleHabit(habit.id)} className="p-1 bg-green-500 rounded">
-              Complete
+            <button onClick={() => toggleHabit(habit.id)} className="btn-glass bg-green-500/20 text-green-400">
+              Done
             </button>
           </div>
         ))}
