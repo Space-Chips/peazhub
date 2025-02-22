@@ -12,60 +12,86 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [timeSpent, setTimeSpent] = useState(selectedTask.timeSpent || 0);
+  const [showTaskPopup, setShowTaskPopup] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskCategory, setNewTaskCategory] = useState("Work");
+  const [newTaskPriority, setNewTaskPriority] = useState("Medium");
 
   const modes = {
     Standard: { focus: 25 * 60, break: 5 * 60 },
     Eisenhower: { focus: 25 * 60, break: 5 * 60 },
-    Monk: { focus: 50 * 60, break: 0 },
+    Monk: { focus: 90 * 60, break: 30 * 60 },
+    Sprint: { focus: 15 * 60, break: 5 * 60 },
+    DeepWork: { focus: 120 * 60, break: 40 * 60 },
+    Flow: { focus: 52 * 60, break: 17 * 60 },
   };
 
-  const sessionDuration = modes[mode]?.focus || 0;
+  const sessionDuration = mode ? modes[mode].focus : 0;
   const totalTime = sessionDuration * sessions;
-  const sessionProgress = (1 - timeLeft / sessionDuration) * 100;
-  const overallProgress = ((currentSession - 1) * sessionDuration + (sessionDuration - timeLeft)) / totalTime * 100;
+  const sessionProgress = sessionDuration ? (1 - timeLeft / sessionDuration) * 100 : 0;
+  const overallProgress = totalTime
+    ? ((currentSession - 1) * sessionDuration + (sessionDuration - timeLeft)) / totalTime * 100
+    : 0;
 
+  // Initialize timeLeft when mode changes
   useEffect(() => {
-    if (mode && !timeLeft) {
+    if (mode && !isRunning) {
       setTimeLeft(modes[mode].focus);
     }
+  }, [mode]);
 
-    let timer;
-    if (isRunning && timeLeft > 0) {
-      timer = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev > 0) {
-            setTimeSpent((prev) => {
-              const newTime = prev + 1;
-              setTasks((prevTasks) =>
-                prevTasks.map((t) => (t.id === selectedTask.id ? { ...t, timeSpent: newTime } : t))
-              );
-              return newTime;
-            });
-            return prev - 1;
-          }
-          return 0;
-        });
-      }, 1000);
-    } else if (timeLeft === 0 && currentSession < sessions) {
-      setCurrentSession((prev) => prev + 1);
-      setTimeLeft(modes[mode].focus);
-    } else if (timeLeft === 0 && currentSession === sessions) {
-      setIsRunning(false);
-    }
+  // Timer logic
+  useEffect(() => {
+    if (!isRunning || !mode) return;
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => {
+        if (prev > 0) {
+          setTimeSpent((prev) => {
+            const newTime = prev + 1;
+            setTasks((prevTasks) =>
+              prevTasks.map((t) => (t.id === selectedTask.id ? { ...t, timeSpent: newTime } : t))
+            );
+            return newTime;
+          });
+          return prev - 1;
+        }
+        if (currentSession < sessions) {
+          setCurrentSession((prev) => prev + 1);
+          return modes[mode].focus;
+        }
+        setIsRunning(false);
+        return 0;
+      });
+    }, 1000);
+
     return () => clearInterval(timer);
   }, [isRunning, timeLeft, mode, currentSession, sessions, selectedTask, setTasks]);
 
-  const startGrind = () => setIsRunning(true);
+  const startGrind = () => {
+    setIsRunning(true);
+  };
+
   const completeTask = () => {
     setTasks((prevTasks) =>
       prevTasks.map((t) => (t.id === selectedTask.id ? { ...t, completed: true } : t))
     );
     setGrindModeActive(false);
   };
+
   const addTask = () => {
     if (newTaskTitle) {
-      setTasks([...tasks, { id: Date.now(), title: newTaskTitle, category: "Work", priority: "Medium", completed: false, timeSpent: 0 }]);
+      setTasks([
+        ...tasks,
+        {
+          id: Date.now(),
+          title: newTaskTitle,
+          category: newTaskCategory,
+          priority: newTaskPriority,
+          completed: false,
+          timeSpent: 0,
+        },
+      ]);
       setNewTaskTitle("");
     }
   };
@@ -73,7 +99,7 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
   if (!mode) {
     return (
       <div className="fixed inset-0 flex items-center justify-center">
-        <div className="glass p-8 shadow-lg text-center w-1/2">
+        <div className="glass p-8 shadow-lg text-center w-2/3">
           <h2 className="text-2xl font-bold text-neon-green mb-6">Choose Grind Mode</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <button onClick={() => setMode("Standard")} className="btn-glass bg-neon-green/20">
@@ -83,7 +109,16 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
               Eisenhower (25m)
             </button>
             <button onClick={() => setMode("Monk")} className="btn-glass bg-neon-green/20">
-              Monk Mode (50m)
+              Monk (1:30h)
+            </button>
+            <button onClick={() => setMode("Sprint")} className="btn-glass bg-neon-green/20">
+              Sprint (15m)
+            </button>
+            <button onClick={() => setMode("DeepWork")} className="btn-glass bg-neon-green/20">
+              Deep Work (2h)
+            </button>
+            <button onClick={() => setMode("Flow")} className="btn-glass bg-neon-green/20">
+              Flow (52m)
             </button>
           </div>
           <div className="mb-6">
@@ -118,6 +153,15 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
           </button>
           <button onClick={() => setMode("Monk")} className="btn-glass bg-neon-green/20">
             Monk
+          </button>
+          <button onClick={() => setMode("Sprint")} className="btn-glass bg-neon-green/20">
+            Sprint
+          </button>
+          <button onClick={() => setMode("DeepWork")} className="btn-glass bg-neon-green/20">
+            Deep Work
+          </button>
+          <button onClick={() => setMode("Flow")} className="btn-glass bg-neon-green/20">
+            Flow
           </button>
         </div>
         <p className="text-lg font-semibold text-gray-200 mb-2">{selectedTask.title}</p>
@@ -175,34 +219,95 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
           Total Time: {Math.floor(timeSpent / 3600)}h {Math.floor((timeSpent % 3600) / 60)}m {timeSpent % 60}s
         </p>
         <QuoteDisplay />
-        <div className="mt-6 mb-6">
-          <input
-            type="text"
-            value={newTaskTitle}
-            onChange={(e) => setNewTaskTitle(e.target.value)}
-            placeholder="Add a new task"
-            className="p-2 bg-transparent border-b border-white/20 text-gray-200 w-1/2 mr-4"
-          />
-          <button onClick={addTask} className="btn-glass bg-red-500/20">
-            Add Task
+        <div className="space-y-4">
+          <button
+            onClick={() => setShowTaskPopup(true)}
+            className="btn-glass bg-blue-500/20"
+          >
+            Manage Tasks
+          </button>
+          {!isRunning ? (
+            <button onClick={startGrind} className="btn-glass bg-green-500/20">
+              Start Grinding
+            </button>
+          ) : (
+            <button onClick={completeTask} className="btn-glass bg-green-500/20">
+              Complete Task
+            </button>
+          )}
+          <button
+            onClick={() => setGrindModeActive(false)}
+            className="btn-glass bg-red-500/20"
+          >
+            Exit Grind Mode
           </button>
         </div>
-        {!isRunning && timeLeft === modes[mode].focus ? (
-          <button onClick={startGrind} className="btn-glass bg-green-500/20">
-            Start Grinding
-          </button>
-        ) : (
-          <button onClick={completeTask} className="btn-glass bg-green-500/20">
-            Complete Task
-          </button>
-        )}
-        <button
-          onClick={() => setGrindModeActive(false)}
-          className="mt-4 btn-glass bg-red-500/20"
-        >
-          Exit Grind Mode
-        </button>
       </div>
+
+      {showTaskPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+          <div className="glass p-6 shadow-lg w-1/2">
+            <h3 className="text-xl font-bold text-neon-green mb-4">Task Management</h3>
+            <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
+              {tasks.map((task) => (
+                <div key={task.id} className="flex items-center justify-between">
+                  <span className={task.completed ? "line-through text-gray-400" : "text-gray-200"}>
+                    {task.title} ({task.category}, {task.priority})
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={task.completed}
+                    onChange={() =>
+                      setTasks((prev) =>
+                        prev.map((t) =>
+                          t.id === task.id ? { ...t, completed: !t.completed } : t
+                        )
+                      )
+                    }
+                    className="form-checkbox h-5 w-5 text-neon-green"
+                  />
+                </div>
+              ))}
+            </div>
+            <div className="mb-6">
+              <input
+                type="text"
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                placeholder="New task title"
+                className="p-2 bg-transparent border-b border-white/20 text-gray-200 w-full mb-2"
+              />
+              <select
+                value={newTaskCategory}
+                onChange={(e) => setNewTaskCategory(e.target.value)}
+                className="p-2 bg-transparent border-b border-white/20 text-gray-200 w-full mb-2"
+              >
+                <option>Work</option>
+                <option>Fitness</option>
+                <option>Personal Growth</option>
+              </select>
+              <select
+                value={newTaskPriority}
+                onChange={(e) => setNewTaskPriority(e.target.value)}
+                className="p-2 bg-transparent border-b border-white/20 text-gray-200 w-full mb-2"
+              >
+                <option>Low</option>
+                <option>Medium</option>
+                <option>High</option>
+              </select>
+              <button onClick={addTask} className="btn-glass bg-red-500/20 w-full">
+                Add Task
+              </button>
+            </div>
+            <button
+              onClick={() => setShowTaskPopup(false)}
+              className="btn-glass bg-red-500/20 w-full"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
