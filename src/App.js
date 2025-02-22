@@ -18,7 +18,6 @@ const App = () => {
       setSelectedTask(task);
       setGrindModeActive(true);
     }
-    // If no task, Navigation will handle redirection
   };
 
   return (

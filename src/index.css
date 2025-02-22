@@ -24,7 +24,7 @@ body {
 }
 
 .btn-glass {
-  @apply glass glass-hover px-4 py-2 rounded-xl text-gray-200 font-semibold;
+  @apply glass glass-hover px-4 py-2 rounded-xl text-gray-900 font-semibold; /* Changed text to dark gray */
 }
 
 .priority-low { @apply bg-green-500/20 text-green-400; }

@@ -5,13 +5,12 @@ const Navigation = ({ setGrindModeActive }) => {
   const navigate = useNavigate();
 
   const handleGrindModeClick = () => {
-    // Redirect to Tasks page instead of setting grindModeActive directly
     navigate("/tasks");
   };
 
   return (
     <div className="w-1/5 p-6 fixed h-full glass flex flex-col">
-      <h1 className="text-2xl font-bold text-neon-green mb-8">PeaZhub</h1>
+      <h1 className="text-2xl font-bold text-neon-green mb-8">R E L E N T L E S S</h1>
       <nav className="flex-1">
         <ul>
           <li>
@@ -33,7 +32,7 @@ const Navigation = ({ setGrindModeActive }) => {
       </nav>
       <button
         onClick={handleGrindModeClick}
-        className="btn-glass bg-red-500/20 text-black"
+        className="btn-glass bg-red-500/20"
       >
         Grind Mode
       </button>

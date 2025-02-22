@@ -5,13 +5,14 @@ import QuoteDisplay from "./QuoteDisplay";
 import { useData } from "../context/DataContext";
 
 const GrindMode = ({ selectedTask, setGrindModeActive }) => {
-  const { setTasks } = useData();
+  const { tasks, setTasks } = useData();
   const [mode, setMode] = useState(null);
   const [sessions, setSessions] = useState(1);
   const [currentSession, setCurrentSession] = useState(1);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
   const [timeSpent, setTimeSpent] = useState(selectedTask.timeSpent || 0);
+  const [newTaskTitle, setNewTaskTitle] = useState("");
 
   const modes = {
     Standard: { focus: 25 * 60, break: 5 * 60 },
@@ -56,6 +57,18 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
   }, [isRunning, timeLeft, mode, currentSession, sessions, selectedTask, setTasks]);
 
   const startGrind = () => setIsRunning(true);
+  const completeTask = () => {
+    setTasks((prevTasks) =>
+      prevTasks.map((t) => (t.id === selectedTask.id ? { ...t, completed: true } : t))
+    );
+    setGrindModeActive(false);
+  };
+  const addTask = () => {
+    if (newTaskTitle) {
+      setTasks([...tasks, { id: Date.now(), title: newTaskTitle, category: "Work", priority: "Medium", completed: false, timeSpent: 0 }]);
+      setNewTaskTitle("");
+    }
+  };
 
   if (!mode) {
     return (
@@ -63,13 +76,13 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
         <div className="glass p-8 shadow-lg text-center w-1/2">
           <h2 className="text-2xl font-bold text-neon-green mb-6">Choose Grind Mode</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <button onClick={() => setMode("Standard")} className="btn-glass bg-neon-green/20 text-neon-green">
+            <button onClick={() => setMode("Standard")} className="btn-glass bg-neon-green/20">
               Standard (25m)
             </button>
-            <button onClick={() => setMode("Eisenhower")} className="btn-glass bg-neon-green/20 text-neon-green">
+            <button onClick={() => setMode("Eisenhower")} className="btn-glass bg-neon-green/20">
               Eisenhower (25m)
             </button>
-            <button onClick={() => setMode("Monk")} className="btn-glass bg-neon-green/20 text-neon-green">
+            <button onClick={() => setMode("Monk")} className="btn-glass bg-neon-green/20">
               Monk Mode (50m)
             </button>
           </div>
@@ -84,7 +97,7 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
               className="p-2 bg-transparent border-b border-white/20 text-gray-200 w-16"
             />
           </div>
-          <button onClick={() => setGrindModeActive(false)} className="btn-glass bg-red-500/20 text-red-400">
+          <button onClick={() => setGrindModeActive(false)} className="btn-glass bg-red-500/20">
             Cancel
           </button>
         </div>
@@ -94,8 +107,19 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center">
-      <div className="glass p-8 shadow-lg text-center w-1/2">
+      <div className="glass p-8 shadow-lg text-center w-2/3">
         <h2 className="text-2xl font-bold text-neon-green mb-4">{mode} Grind</h2>
+        <div className="flex justify-center space-x-4 mb-6">
+          <button onClick={() => setMode("Standard")} className="btn-glass bg-neon-green/20">
+            Standard
+          </button>
+          <button onClick={() => setMode("Eisenhower")} className="btn-glass bg-neon-green/20">
+            Eisenhower
+          </button>
+          <button onClick={() => setMode("Monk")} className="btn-glass bg-neon-green/20">
+            Monk
+          </button>
+        </div>
         <p className="text-lg font-semibold text-gray-200 mb-2">{selectedTask.title}</p>
         <div className="flex justify-center space-x-2 mb-4">
           <span className="text-sm text-blue-400">{selectedTask.category}</span>
@@ -139,18 +163,42 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
             <p className="text-sm text-gray-400 mt-2">Overall Progress</p>
           </div>
         </div>
+        <div className="flex justify-center space-x-2 mb-6">
+          {Array.from({ length: sessions }, (_, i) => (
+            <div
+              key={i}
+              className={`w-3 h-3 rounded-full ${i < currentSession ? "bg-neon-green" : "bg-gray-500/20"}`}
+            />
+          ))}
+        </div>
         <p className="text-sm text-gray-400 mb-6">
           Total Time: {Math.floor(timeSpent / 3600)}h {Math.floor((timeSpent % 3600) / 60)}m {timeSpent % 60}s
         </p>
         <QuoteDisplay />
-        {!isRunning && timeLeft === modes[mode].focus && (
-          <button onClick={startGrind} className="mt-6 btn-glass bg-green-500/20 text-green-400">
+        <div className="mt-6 mb-6">
+          <input
+            type="text"
+            value={newTaskTitle}
+            onChange={(e) => setNewTaskTitle(e.target.value)}
+            placeholder="Add a new task"
+            className="p-2 bg-transparent border-b border-white/20 text-gray-200 w-1/2 mr-4"
+          />
+          <button onClick={addTask} className="btn-glass bg-red-500/20">
+            Add Task
+          </button>
+        </div>
+        {!isRunning && timeLeft === modes[mode].focus ? (
+          <button onClick={startGrind} className="btn-glass bg-green-500/20">
             Start Grinding
+          </button>
+        ) : (
+          <button onClick={completeTask} className="btn-glass bg-green-500/20">
+            Complete Task
           </button>
         )}
         <button
           onClick={() => setGrindModeActive(false)}
-          className="mt-6 btn-glass bg-red-500/20 text-red-400"
+          className="mt-4 btn-glass bg-red-500/20"
         >
           Exit Grind Mode
         </button>
