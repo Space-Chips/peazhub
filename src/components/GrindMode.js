@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { FaTasks, FaPlay, FaCheck, FaTimes, FaSpotify } from "react-icons/fa";
 import QuoteDisplay from "./QuoteDisplay";
 import { useData } from "../context/DataContext";
 
@@ -35,14 +36,14 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
 
   // Initialize timeLeft when mode changes
   useEffect(() => {
-    if (mode && !isRunning) {
+    if (mode && !isRunning && timeLeft === 0) {
       setTimeLeft(modes[mode].focus);
     }
   }, [mode]);
 
   // Timer logic
   useEffect(() => {
-    if (!isRunning || !mode) return;
+    if (!isRunning) return;
 
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
@@ -69,6 +70,8 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
   }, [isRunning, timeLeft, mode, currentSession, sessions, selectedTask, setTasks]);
 
   const startGrind = () => {
+    if (!mode) return;
+    if (timeLeft === 0) setTimeLeft(modes[mode].focus);
     setIsRunning(true);
   };
 
@@ -94,6 +97,20 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
       ]);
       setNewTaskTitle("");
     }
+  };
+
+  const playSpotify = () => {
+    // Simulate Spotify playback (requires OAuth token and Web Playback SDK for full implementation)
+    console.log("Playing motivational playlist on Spotify...");
+    // Example: Fetch a playlist (requires Spotify API setup)
+    // const token = "YOUR_SPOTIFY_ACCESS_TOKEN"; // Replace with actual token
+    // fetch("https://api.spotify.com/v1/playlists/37i9dQZF1DX9gG9wbF8eCL", {
+    //   headers: { Authorization: `Bearer ${token}` },
+    // })
+    //   .then((res) => res.json())
+    //   .then((data) => console.log("Playing:", data.name))
+    //   .catch((err) => console.error("Spotify Error:", err));
+    alert("Spotify integration triggered! Add OAuth and Web Playback SDK for full playback.");
   };
 
   if (!mode) {
@@ -133,7 +150,7 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
             />
           </div>
           <button onClick={() => setGrindModeActive(false)} className="btn-glass bg-red-500/20">
-            Cancel
+            <FaTimes className="inline mr-2" /> Cancel
           </button>
         </div>
       </div>
@@ -222,24 +239,36 @@ const GrindMode = ({ selectedTask, setGrindModeActive }) => {
         <div className="space-y-4">
           <button
             onClick={() => setShowTaskPopup(true)}
-            className="btn-glass bg-blue-500/20"
+            className="btn-glass bg-blue-500/20 flex items-center justify-center"
           >
-            Manage Tasks
+            <FaTasks className="mr-2" /> Manage Tasks
+          </button>
+          <button
+            onClick={playSpotify}
+            className="btn-glass bg-spotify-green/20 flex items-center justify-center"
+          >
+            <FaSpotify className="mr-2" /> Play Music
           </button>
           {!isRunning ? (
-            <button onClick={startGrind} className="btn-glass bg-green-500/20">
-              Start Grinding
+            <button
+              onClick={startGrind}
+              className="btn-glass bg-green-500/20 flex items-center justify-center"
+            >
+              <FaPlay className="mr-2" /> Start Grinding
             </button>
           ) : (
-            <button onClick={completeTask} className="btn-glass bg-green-500/20">
-              Complete Task
+            <button
+              onClick={completeTask}
+              className="btn-glass bg-green-500/20 flex items-center justify-center"
+            >
+              <FaCheck className="mr-2" /> Complete Task
             </button>
           )}
           <button
             onClick={() => setGrindModeActive(false)}
-            className="btn-glass bg-red-500/20"
+            className="btn-glass bg-red-500/20 flex items-center justify-center"
           >
-            Exit Grind Mode
+            <FaTimes className="mr-2" /> Exit Grind Mode
           </button>
         </div>
       </div>
