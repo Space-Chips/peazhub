@@ -16,7 +16,9 @@ const App = () => {
   const handleGrindMode = (task) => {
     if (task) {
       setSelectedTask(task);
-      setGrindModeActive(true);
+      setGrindModeActive(true); // Ensure this sets to true with a task
+    } else {
+      console.log("No task provided, staying on current page.");
     }
   };
 

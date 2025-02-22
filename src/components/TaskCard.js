@@ -24,7 +24,15 @@ const TaskCard = ({ task, updateTask, deleteTask, startGrindMode }) => {
         <h3 className="text-lg font-semibold text-gray-200">{task.title}</h3>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-blue-400">{task.category}</span>
-          <span className={`text-xs px-2 py-1 rounded-full ${task.priority === "High" ? "priority-high" : task.priority === "Medium" ? "priority-medium" : "priority-low"}`}>
+          <span
+            className={`text-xs px-2 py-1 rounded-full ${
+              task.priority === "High"
+                ? "priority-high"
+                : task.priority === "Medium"
+                ? "priority-medium"
+                : "priority-low"
+            }`}
+          >
             {task.priority}
           </span>
         </div>
@@ -39,16 +47,21 @@ const TaskCard = ({ task, updateTask, deleteTask, startGrindMode }) => {
         >
           {isRunning ? "Stop" : "Start"}
         </button>
-        <button onClick={() => startGrindMode(task)} className="btn-glass bg-neon-green/20 text-neon-green">
-          Grind Now
+        <button
+          onClick={() => startGrindMode(task)}
+          className="btn-glass bg-neon-green/20 text-neon-green"
+        >
+          Start Grinding
         </button>
-        <button onClick={() => deleteTask(task.id)} className="btn-glass bg-red-500/20 text-red-400">
+        <button
+          onClick={() => deleteTask(task.id)}
+          className="btn-glass bg-red-500/20 text-red-400"
+        >
           Delete
         </button>
       </div>
     </div>
   );
 };
-
 
 export default TaskCard;

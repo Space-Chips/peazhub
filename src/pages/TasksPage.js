@@ -24,7 +24,7 @@ const TasksPage = ({ setGrindModeActive }) => {
   };
 
   const startGrindMode = (task) => {
-    setGrindModeActive(task);
+    setGrindModeActive(task); // Pass the task to trigger Grind Mode
   };
 
   return (
@@ -56,7 +56,7 @@ const TasksPage = ({ setGrindModeActive }) => {
           <option>Medium</option>
           <option>High</option>
         </select>
-        <button onClick={addTask} className="btn-glass bg-red-500/20 text-red-400">
+        <button onClick={addTask} className="btn-glass bg-red-500/20">
           Add
         </button>
       </div>
