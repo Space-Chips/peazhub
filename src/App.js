@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { BrowserRouter as Router, Route, Routes, useNavigate } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navigation from "./components/Navigation";
 import GrindMode from "./components/GrindMode";
 import Dashboard from "./pages/Dashboard";
@@ -16,7 +16,7 @@ const App = () => {
   const handleGrindMode = (task) => {
     if (task) {
       setSelectedTask(task);
-      setGrindModeActive(true); // Ensure this sets to true with a task
+      setGrindModeActive(true);
     } else {
       console.log("No task provided, staying on current page.");
     }
@@ -25,9 +25,17 @@ const App = () => {
   return (
     <DataProvider>
       <Router>
-        <div className="flex min-h-screen">
-          {!grindModeActive && <Navigation setGrindModeActive={handleGrindMode} />}
-          <div className="flex-1 container">
+        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-800 to-black font-sans">
+          {/* RELENTLESS Title */}
+          {!grindModeActive && (
+            <div className="fixed top-0 left-0 right-0 py-4 z-50">
+              <h1 className="text-3xl font-bold text-white tracking-widest text-center">
+                R E L E N T L E S S
+              </h1>
+            </div>
+          )}
+          {/* Main Content */}
+          <div className="flex-1 p-6 pt-20">
             {grindModeActive && selectedTask ? (
               <GrindMode
                 selectedTask={selectedTask}
@@ -43,6 +51,10 @@ const App = () => {
               </Routes>
             )}
           </div>
+          {/* Bottom Dock */}
+          {!grindModeActive && (
+            <Navigation setGrindModeActive={handleGrindMode} />
+          )}
         </div>
       </Router>
     </DataProvider>

@@ -2,7 +2,6 @@ import React from "react";
 
 const QuoteDisplay = ({ period }) => {
   const workQuotes = [
-    // Provided Quotes
     "While others sleep, I work. While others talk, I deliver. Mediocrity is for those who accept it.",
     "Your potential means nothing. Your output means everything.",
     "Discipline isn't a choice, it's the only path that leads to power.",
@@ -23,7 +22,6 @@ const QuoteDisplay = ({ period }) => {
     "The moment you become satisfied is the moment your competition surpasses you.",
     "The greatest barrier between you and success is the comfort of mediocrity.",
     "Every minute spent planning is an hour earned in execution.",
-    // Additional Frank Underwood-Styled Quotes
     "Power is not given; it’s taken by those who refuse to bend.",
     "Weakness is a luxury I can’t afford—neither should you.",
     "The game doesn’t pause for your hesitation; it rewards the relentless.",
@@ -54,7 +52,13 @@ const QuoteDisplay = ({ period }) => {
       ? workQuotes[Math.floor(Math.random() * workQuotes.length)]
       : breakQuotes[Math.floor(Math.random() * breakQuotes.length)];
 
-  return <p className="text-gray-400 italic text-center mb-6">"{quote}"</p>;
+  return (
+    <div className="relative bg-gray-900/60 backdrop-blur-md border border-white/10 rounded-lg p-4 shadow-md mb-6 transition-opacity duration-300">
+      <span className="absolute left-2 top-0 text-4xl text-white/30">“</span>
+      <p className="text-white text-xl font-bold italic text-center px-6 animate-fadeIn">"{quote}"</p>
+      <span className="absolute right-2 bottom-0 text-4xl text-white/30">”</span>
+    </div>
+  );
 };
 
 export default QuoteDisplay;
