@@ -198,7 +198,7 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
   }
 
   return (
-    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-900 via-purple-900 to-black font-sans">
+    <div className="fixed inset-0 flex items-center justify-center bg-gradient-to-b from-gray-800 to-gray-900 font-sans">
       <div className="p-10 bg-gray-900/60 backdrop-blur-xl rounded-2xl shadow-2xl text-white w-11/12 max-w-4xl border border-white/10">
         <div className="flex justify-between items-center mb-8">
           <h2 className="text-4xl font-bold text-green-400 tracking-tight">{mode} Grind</h2>
