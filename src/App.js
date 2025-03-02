@@ -8,6 +8,8 @@ import HabitsPage from "./pages/HabitsPage";
 import GoalsPage from "./pages/GoalsPage";
 import AnalyticsPage from "./pages/AnalyticsPage";
 import { DataProvider } from "./context/DataContext";
+import { DndContext } from '@dnd-kit/core';
+
 
 const App = () => {
   const [grindModeActive, setGrindModeActive] = useState(false);
@@ -23,40 +25,45 @@ const App = () => {
   };
 
   return (
-    <DataProvider>
+
+    <DataProvider>  
+
       <Router>
-        <div className="flex flex-col min-h-screen bg-gradient-to-br from-gray-800 to-black font-sans">
-          {/* RELENTLESS Title */}
-          {!grindModeActive && (
-            <div className="fixed top-0 left-0 right-0 py-4 z-50">
-              <h1 className="text-3xl font-bold text-white tracking-widest text-center">
-                R E L E N T L E S S
-              </h1>
+        <DndContext>
+          <div className="flex flex-col min-h-screen black font-sans">
+            {/* RELENTLESS Title */}
+            {!grindModeActive && (
+              <div className="fixed top-0 left-0 right-0 py-4 z-50">
+                <h1 className="text-3xl font-bold text-white tracking-widest text-center">
+                  R E L E N T L E S S
+                </h1>
+              </div>
+            )}
+            {/* Main Content */}
+            <div className="flex-1 p-6 pt-20"> {/* Padding with pt-20 for title spacing */}
+              {grindModeActive && selectedTask ? (
+                <GrindMode
+                  selectedTask={selectedTask}
+                  setGrindModeActive={setGrindModeActive}
+                />
+              ) : (
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/tasks" element={<TasksPage setGrindModeActive={handleGrindMode} />} />
+                  <Route path="/habits" element={<HabitsPage />} />
+                  <Route path="/goals" element={<GoalsPage />} />
+                  <Route path="/analytics" element={<AnalyticsPage />} />
+                </Routes>
+              )}
             </div>
-          )}
-          {/* Main Content */}
-          <div className="flex-1 p-6 pt-20">
-            {grindModeActive && selectedTask ? (
-              <GrindMode
-                selectedTask={selectedTask}
-                setGrindModeActive={setGrindModeActive}
-              />
-            ) : (
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/tasks" element={<TasksPage setGrindModeActive={handleGrindMode} />} />
-                <Route path="/habits" element={<HabitsPage />} />
-                <Route path="/goals" element={<GoalsPage />} />
-                <Route path="/analytics" element={<AnalyticsPage />} />
-              </Routes>
+            {/* Bottom Dock */}
+            {!grindModeActive && (
+              <Navigation setGrindModeActive={handleGrindMode} />
             )}
           </div>
-          {/* Bottom Dock */}
-          {!grindModeActive && (
-            <Navigation setGrindModeActive={handleGrindMode} />
-          )}
-        </div>
+        </DndContext>
       </Router>
+
     </DataProvider>
   );
 };
