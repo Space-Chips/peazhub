@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DndContext, useDraggable, useDroppable, closestCenter } from "@dnd-kit/core";
 import { FaCheck, FaTrash, FaDumbbell } from "react-icons/fa";
 import { useData } from "../context/DataContext";
@@ -8,6 +8,25 @@ const TasksPage = ({ setGrindModeActive }) => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("Work");
   const [priority, setPriority] = useState("Medium");
+
+  // Migrate old tasks without 'board' property on mount
+  useEffect(() => {
+    const migratedTasks = tasks.map((task) => {
+      if (!task.board) {
+        let board = "toDo"; // Default for old tasks
+        if (task.completed) {
+          board = "done";
+        } else if (task.timeSpent > 0) {
+          board = "doing";
+        }
+        return { ...task, board };
+      }
+      return task;
+    });
+    if (migratedTasks.some((t, i) => t.board !== tasks[i]?.board)) {
+      setTasks(migratedTasks);
+    }
+  }, [tasks, setTasks]);
 
   // Add a new task
   const addTask = () => {
@@ -87,11 +106,11 @@ const TasksPage = ({ setGrindModeActive }) => {
     setTasks(updatedTasks);
   };
 
-  // Derive boards from tasks
+  // Derive boards from tasks, falling back for old data
   const boards = {
-    toDo: tasks.filter((t) => t.board === "toDo"),
-    doing: tasks.filter((t) => t.board === "doing"),
-    done: tasks.filter((t) => t.board === "done"),
+    toDo: tasks.filter((t) => t.board === "toDo" || (!t.board && !t.completed && (!t.timeSpent || t.timeSpent === 0))),
+    doing: tasks.filter((t) => t.board === "doing" || (!t.board && !t.completed && t.timeSpent > 0)),
+    done: tasks.filter((t) => t.board === "done" || (!t.board && t.completed)),
   };
 
   return (
@@ -205,15 +224,15 @@ const Board = ({ id, title, tasks, updateTask, deleteTask, startGrindMode, forma
 const TaskCard = ({ task, updateTask, deleteTask, startGrindMode, formatTime }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,
-    data: { board: task.board }, // Pass current board for reference
+    data: { board: task.board },
   });
 
   const style = transform
     ? {
-        transform: `translate(${transform.x}px, ${transform.y}px)`, // Simplified transform
-        zIndex: 1000, // High z-index when dragging
+        transform: `translate(${transform.x}px, ${transform.y}px)`,
+        zIndex: 1000,
       }
-    : { zIndex: 1 }; // Default z-index when not dragging
+    : { zIndex: 1 };
 
   return (
     <div
@@ -260,7 +279,7 @@ const TaskCard = ({ task, updateTask, deleteTask, startGrindMode, formatTime }) 
         </button>
         <button
           onClick={() => deleteTask(task.id)}
-          className="p-2 bg-red-500/10 rounded-full hover:bg-yellow-500/20 transition-all duration-200 backdrop-blur-md border border-white/10"
+          className="p-2 bg-red-500/10 rounded-full hover:bg-red-500/20 transition-all duration-200 backdrop-blur-md border border-white/10"
           title="Delete Task"
         >
           <FaTrash size={16} color="#EF4444" />
