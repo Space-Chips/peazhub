@@ -116,10 +116,6 @@ const TasksPage = ({ setGrindModeActive }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-800 to-black font-sans">
       <div className="p-6 pt-20">
-        <h1 className="text-3xl font-bold text-white tracking-widest text-center mb-8">
-          T A S K S
-        </h1>
-
         {/* Task Input Form */}
         <div className="bg-gray-900/60 backdrop-blur-md rounded-xl p-6 shadow-md border border-white/10 mb-10">
           <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
