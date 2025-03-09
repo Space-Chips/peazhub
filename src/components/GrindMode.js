@@ -28,7 +28,7 @@ const QuoteDisplay = ({ period, theme }) => {
   );
 };
 
-// Theme definitions (fully restored)
+// Theme definitions (fully defined as before)
 const themes = {
   Basic: {
     name: "Basic",
@@ -54,9 +54,9 @@ const themes = {
     textColor: "text-white",
     textColorMuted: "text-white/80",
     progressColors: {
-      work: "#10B981", // green
-      break: "#3B82F6", // blue
-      overall: "#EF4444", // red
+      work: "#10B981",
+      break: "#3B82F6",
+      overall: "#EF4444",
     },
   },
   Cyberpunk: {
@@ -83,9 +83,9 @@ const themes = {
     textColor: "text-cyan-50",
     textColorMuted: "text-cyan-100/70",
     progressColors: {
-      work: "#06B6D4", // cyan
-      break: "#D946EF", // fuchsia
-      overall: "#FACC15", // yellow
+      work: "#06B6D4",
+      break: "#D946EF",
+      overall: "#FACC15",
     },
   },
   Patriotic: {
@@ -112,9 +112,9 @@ const themes = {
     textColor: "text-blue-900",
     textColorMuted: "text-blue-700/70",
     progressColors: {
-      work: "#DC2626", // Red
-      break: "#1D4ED8", // Blue
-      overall: "#FFFFFF", // White
+      work: "#DC2626",
+      break: "#1D4ED8",
+      overall: "#FFFFFF",
     },
   },
   Nature: {
@@ -141,9 +141,9 @@ const themes = {
     textColor: "text-emerald-50",
     textColorMuted: "text-emerald-100/70",
     progressColors: {
-      work: "#10B981", // emerald
-      break: "#78716C", // stone
-      overall: "#F59E0B", // amber
+      work: "#10B981",
+      break: "#78716C",
+      overall: "#F59E0B",
     },
   },
   Midnight: {
@@ -170,9 +170,9 @@ const themes = {
     textColor: "text-slate-100",
     textColorMuted: "text-slate-300/70",
     progressColors: {
-      work: "#6366F1", // indigo
-      break: "#A78BFA", // violet
-      overall: "#38BDF8", // sky
+      work: "#6366F1",
+      break: "#A78BFA",
+      overall: "#38BDF8",
     },
   },
 };
@@ -197,9 +197,9 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
   const [currentTheme, setCurrentTheme] = useState("Basic");
   const [freedomModeActive, setFreedomModeActive] = useState(false);
   const [blockedSites, setBlockedSites] = useState([
+    "youtube.com",
     "facebook.com",
     "twitter.com",
-    "youtube.com",
     "instagram.com",
     "tiktok.com",
   ]);
@@ -216,7 +216,7 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
     Custom: { work: customWork * 60, break: customBreak * 60 },
   };
 
-  const theme = themes[currentTheme] || themes.Basic; // Fallback to Basic if theme is undefined
+  const theme = themes[currentTheme] || themes.Basic;
   const sessionDuration = mode ? modes[mode][currentPeriod] : 0;
   const totalWorkTime = mode ? modes[mode].work * sessions : 0;
   const sessionProgress = sessionDuration ? (1 - timeLeft / sessionDuration) * 100 : 0;
@@ -240,8 +240,11 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
     }
     if (mode === "Freedom" && isRunning && !isPaused && currentPeriod === "work") {
       setFreedomModeActive(true);
+      // Attempt to prevent navigation (limited effectiveness)
+      window.onbeforeunload = () => "Freedom mode is active! Are you sure you want to leave?";
     } else {
       setFreedomModeActive(false);
+      window.onbeforeunload = null; // Remove navigation warning during breaks or other modes
     }
   }, [mode, isRunning, isPaused, timeLeft, currentPeriod]);
 
@@ -339,7 +342,7 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
 
   const simulateWebsiteAccess = (site) => {
     if (freedomModeActive && blockedSites.includes(site)) {
-      alert(`Access to ${site} is blocked during Freedom mode! Focus on your task, patriot!`);
+      alert(`Access to ${site} is blocked during Freedom mode! Stay focused, patriot!`);
     } else {
       alert(`Navigating to ${site} (simulated - no actual navigation occurs).`);
     }
@@ -530,389 +533,411 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
   }
 
   return (
-    <div
-      className={`fixed inset-0 flex items-center justify-center bg-gradient-to-b ${theme.gradientFrom} ${theme.gradientTo} font-sans`}
-      style={
-        currentTheme === "Patriotic"
-          ? {
-              backgroundImage: `url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/1200px-Flag_of_the_United_States.svg.png")`,
-              backgroundSize: "cover",
-              backgroundPosition: "center",
-              backgroundBlendMode: "overlay",
-            }
-          : {}
-      }
-    >
+    <>
+      {freedomModeActive && (
+        <div
+          className={`fixed inset-0 bg-black/90 z-50 flex items-center justify-center`}
+          style={{ pointerEvents: "auto" }}
+        >
+          <div className={`text-center ${theme.textColor}`}>
+            <h2 className={`text-4xl font-bold ${theme.primaryColor} mb-4`}>
+              Freedom Mode Active <FaLock className="inline ml-2" size={24} />
+            </h2>
+            <p className="text-xl mb-6">
+              Stay focused, patriot! Distractions like {blockedSites.join(", ")} are blocked.
+            </p>
+            <p className="text-lg italic">
+              "You can't leave until the mission is complete!"
+            </p>
+          </div>
+        </div>
+      )}
       <div
-        className={`p-10 ${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl ${theme.textColor} w-11/12 max-w-4xl border ${theme.borderColor}`}
+        className={`fixed inset-0 flex items-center justify-center bg-gradient-to-b ${theme.gradientFrom} ${theme.gradientTo} font-sans ${
+          freedomModeActive ? "pointer-events-none" : ""
+        }`}
+        style={
+          currentTheme === "Patriotic"
+            ? {
+                backgroundImage: `url("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Flag_of_the_United_States.svg/1200px-Flag_of_the_United_States.svg.png")`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundBlendMode: "overlay",
+              }
+            : {}
+        }
       >
-        <div className="flex justify-between items-center mb-8">
-          <h2 className={`text-4xl font-bold ${theme.primaryColor} tracking-tight`}>
-            {currentTheme === "Patriotic" ? (
-              <span>
-                {mode} Grind{" "}
-                <img src={eagleImage} alt="Eagle" className="inline w-8 h-8 ml-2" />
-              </span>
-            ) : (
-              `${mode} Grind`
-            )}
-            {mode === "Freedom" && freedomModeActive && (
-              <FaLock className="inline ml-2" size={24} />
-            )}
-          </h2>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => setShowThemePopup(true)}
-              disabled={freedomModeActive}
-              className={`p-2 ${theme.accentBgLight} rounded-lg hover:${theme.accentBgMedium} transition-all duration-200 ${theme.borderColor} ${
-                freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
-              }`}
-              title="Change Theme"
-            >
-              <FaPalette size={20} className={theme.accentColor} />
-            </button>
-            {Object.keys(modes).map((m) => (
+        <div
+          className={`p-10 ${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl ${theme.textColor} w-11/12 max-w-4xl border ${theme.borderColor}`}
+        >
+          <div className="flex justify-between items-center mb-8">
+            <h2 className={`text-4xl font-bold ${theme.primaryColor} tracking-tight`}>
+              {currentTheme === "Patriotic" ? (
+                <span>
+                  {mode} Grind{" "}
+                  <img src={eagleImage} alt="Eagle" className="inline w-8 h-8 ml-2" />
+                </span>
+              ) : (
+                `${mode} Grind`
+              )}
+              {mode === "Freedom" && freedomModeActive && (
+                <FaLock className="inline ml-2" size={24} />
+              )}
+            </h2>
+            <div className="flex flex-wrap gap-2">
               <button
-                key={m}
-                onClick={() => {
-                  setMode(m);
-                  setTimeLeft(modes[m].work);
-                  setCurrentPeriod("work");
-                }}
+                onClick={() => setShowThemePopup(true)}
                 disabled={freedomModeActive}
-                className={`px-3 py-1 rounded-lg text-sm backdrop-blur-md border ${theme.borderColor} ${
-                  mode === m ? theme.primaryBgMedium : theme.primaryBgLight
-                } hover:${theme.primaryBgMedium} transition-all duration-200 ${theme.textColor} font-medium ${
+                className={`p-2 ${theme.accentBgLight} rounded-lg hover:${theme.accentBgMedium} transition-all duration-200 ${theme.borderColor} ${
                   freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
                 }`}
+                title="Change Theme"
               >
-                {m}
+                <FaPalette size={20} className={theme.accentColor} />
               </button>
-            ))}
-          </div>
-        </div>
-        <div className="flex justify-center space-x-16 mb-10">
-          <div className="w-52 relative">
-            <CircularProgressbar
-              value={sessionProgress}
-              text={formatTime(timeLeft)}
-              styles={buildStyles({
-                pathColor:
-                  currentPeriod === "work" ? theme.progressColors.work : theme.progressColors.break,
-                textColor: theme.textColor.replace("text-", "#"),
-                trailColor: "rgba(255, 255, 255, 0.1)",
-                textSize: "16px",
-              })}
-            />
-            {currentTheme === "Patriotic" && (
-              <img
-                src={eagleImage}
-                alt="Eagle"
-                className="absolute top-0 left-0 w-12 h-12 -mt-6 -ml-6"
-              />
-            )}
-            <p className={`text-center text-sm ${theme.textColorMuted} mt-2`}>
-              {currentPeriod === "work" ? "Work" : "Break"}
-            </p>
-          </div>
-          <div className="w-52">
-            <CircularProgressbar
-              value={overallProgress}
-              text={`${Math.round(overallProgress)}%`}
-              styles={buildStyles({
-                pathColor: theme.progressColors.overall,
-                textColor: theme.textColor.replace("text-", "#"),
-                trailColor: "rgba(255, 255, 255, 0.1)",
-                textSize: "16px",
-              })}
-            />
-            <p className={`text-center text-sm ${theme.textColorMuted} mt-2`}>Overall</p>
-          </div>
-        </div>
-        <div className="flex justify-center space-x-2 mb-8">
-          {Array.from({ length: sessions }, (_, i) => (
-            <div
-              key={i}
-              className={`w-3 h-3 rounded-full ${
-                i + 1 < currentSession
-                  ? theme.primaryColor.replace("text-", "bg-")
-                  : i + 1 === currentSession
-                  ? `${theme.primaryColor.replace("text-", "bg-")} animate-pulse`
-                  : "bg-gray-500/50"
-              }`}
-            />
-          ))}
-        </div>
-        <p className={`text-xl mb-6 text-center ${theme.textColor} font-medium`}>
-          {currentPeriod === "work"
-            ? `Focusing on: ${selectedTask ? selectedTask.title : "No Task Selected"}`
-            : "Break Time - Stretch or Recharge, Patriot!"}
-          {freedomModeActive && " (Distractions Blocked)"}
-        </p>
-        <QuoteDisplay period={freedomModeActive ? "freedom" : currentPeriod} theme={currentTheme} />
-        {mode === "Freedom" && (
-          <div className="mb-6">
-            <p className={`text-sm ${theme.textColorMuted} text-center`}>
-              Blocked Sites: {blockedSites.join(", ")}
-            </p>
-            <div className="flex justify-center space-x-4 mt-2">
-              {blockedSites.slice(0, 3).map((site) => (
+              {Object.keys(modes).map((m) => (
                 <button
-                  key={site}
-                  onClick={() => simulateWebsiteAccess(site)}
-                  className={`p-2 ${theme.dangerBgLight} rounded-lg hover:${theme.dangerBgMedium} transition-all duration-200 ${theme.borderColor} ${theme.dangerColor}`}
+                  key={m}
+                  onClick={() => {
+                    setMode(m);
+                    setTimeLeft(modes[m].work);
+                    setCurrentPeriod("work");
+                  }}
+                  disabled={freedomModeActive}
+                  className={`px-3 py-1 rounded-lg text-sm backdrop-blur-md border ${theme.borderColor} ${
+                    mode === m ? theme.primaryBgMedium : theme.primaryBgLight
+                  } hover:${theme.primaryBgMedium} transition-all duration-200 ${theme.textColor} font-medium ${
+                    freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
-                  Test {site}
+                  {m}
                 </button>
               ))}
+            </div>
+          </div>
+          <div className="flex justify-center space-x-16 mb-10">
+            <div className="w-52 relative">
+              <CircularProgressbar
+                value={sessionProgress}
+                text={formatTime(timeLeft)}
+                styles={buildStyles({
+                  pathColor:
+                    currentPeriod === "work" ? theme.progressColors.work : theme.progressColors.break,
+                  textColor: theme.textColor.replace("text-", "#"),
+                  trailColor: "rgba(255, 255, 255, 0.1)",
+                  textSize: "16px",
+                })}
+              />
+              {currentTheme === "Patriotic" && (
+                <img
+                  src={eagleImage}
+                  alt="Eagle"
+                  className="absolute top-0 left-0 w-12 h-12 -mt-6 -ml-6"
+                />
+              )}
+              <p className={`text-center text-sm ${theme.textColorMuted} mt-2`}>
+                {currentPeriod === "work" ? "Work" : "Break"}
+              </p>
+            </div>
+            <div className="w-52">
+              <CircularProgressbar
+                value={overallProgress}
+                text={`${Math.round(overallProgress)}%`}
+                styles={buildStyles({
+                  pathColor: theme.progressColors.overall,
+                  textColor: theme.textColor.replace("text-", "#"),
+                  trailColor: "rgba(255, 255, 255, 0.1)",
+                  textSize: "16px",
+                })}
+              />
+              <p className={`text-center text-sm ${theme.textColorMuted} mt-2`}>Overall</p>
+            </div>
+          </div>
+          <div className="flex justify-center space-x-2 mb-8">
+            {Array.from({ length: sessions }, (_, i) => (
+              <div
+                key={i}
+                className={`w-3 h-3 rounded-full ${
+                  i + 1 < currentSession
+                    ? theme.primaryColor.replace("text-", "bg-")
+                    : i + 1 === currentSession
+                    ? `${theme.primaryColor.replace("text-", "bg-")} animate-pulse`
+                    : "bg-gray-500/50"
+                }`}
+              />
+            ))}
+          </div>
+          <p className={`text-xl mb-6 text-center ${theme.textColor} font-medium`}>
+            {currentPeriod === "work"
+              ? `Focusing on: ${selectedTask ? selectedTask.title : "No Task Selected"}`
+              : "Break Time - Stretch or Recharge, Patriot!"}
+            {freedomModeActive && " (Distractions Blocked)"}
+          </p>
+          <QuoteDisplay period={freedomModeActive ? "freedom" : currentPeriod} theme={currentTheme} />
+          {mode === "Freedom" && (
+            <div className="mb-6">
+              <p className={`text-sm ${theme.textColorMuted} text-center`}>
+                Blocked Sites: {blockedSites.join(", ")}
+              </p>
+              <div className="flex justify-center space-x-4 mt-2">
+                {blockedSites.slice(0, 3).map((site) => (
+                  <button
+                    key={site}
+                    onClick={() => simulateWebsiteAccess(site)}
+                    className={`p-2 ${theme.dangerBgLight} rounded-lg hover:${theme.dangerBgMedium} transition-all duration-200 ${theme.borderColor} ${theme.dangerColor}`}
+                  >
+                    Test {site}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+          <div className="flex justify-center space-x-6 mt-8">
+            <button
+              onClick={() => setShowTaskPopup(true)}
+              disabled={freedomModeActive}
+              className={`p-4 ${theme.secondaryBgLight} rounded-full hover:${theme.secondaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
+                freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              title="Manage Tasks"
+              style={
+                currentTheme === "Patriotic"
+                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                  : {}
+              }
+            >
+              <FaTasks size={22} className={theme.textColor} />
+            </button>
+            <button
+              onClick={playSpotify}
+              disabled={freedomModeActive}
+              className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
+                freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              title="Play Music"
+              style={
+                currentTheme === "Patriotic"
+                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                  : {}
+              }
+            >
+              <FaSpotify size={22} className={theme.textColor} />
+            </button>
+            {!isRunning ? (
+              <button
+                onClick={startGrind}
+                className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor}`}
+                title="Start Grinding"
+                style={
+                  currentTheme === "Patriotic"
+                    ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                    : {}
+                }
+              >
+                <FaPlay size={22} className={theme.textColor} />
+              </button>
+            ) : isPaused ? (
+              <button
+                onClick={resumeGrind}
+                className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor}`}
+                title="Resume"
+                style={
+                  currentTheme === "Patriotic"
+                    ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                    : {}
+                }
+              >
+                <FaPlay size={22} className={theme.textColor} />
+              </button>
+            ) : (
+              <button
+                onClick={pauseGrind}
+                className={`p-4 ${theme.warningBgLight} rounded-full hover:${theme.warningBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor}`}
+                title="Pause"
+                style={
+                  currentTheme === "Patriotic"
+                    ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                    : {}
+                }
+              >
+                <FaPause size={22} className={theme.textColor} />
+              </button>
+            )}
+            <button
+              onClick={skipToNext}
+              disabled={freedomModeActive}
+              className={`p-4 ${theme.accentBgLight} rounded-full hover:${theme.accentBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
+                freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              title="Skip to Next"
+              style={
+                currentTheme === "Patriotic"
+                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                  : {}
+              }
+            >
+              <FaForward size={22} className={theme.textColor} />
+            </button>
+            <button
+              onClick={completeTask}
+              disabled={freedomModeActive}
+              className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
+                freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              title="Complete Task"
+              style={
+                currentTheme === "Patriotic"
+                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                  : {}
+              }
+            >
+              <FaCheck size={22} className={theme.textColor} />
+            </button>
+            <button
+              onClick={() => setGrindModeActive(null)}
+              disabled={freedomModeActive}
+              className={`p-4 ${theme.dangerBgLight} rounded-full hover:${theme.dangerBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
+                freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+              title="Exit Grind Mode"
+              style={
+                currentTheme === "Patriotic"
+                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
+                  : {}
+              }
+            >
+              <FaTimes size={22} className={theme.textColor} />
+            </button>
+          </div>
+        </div>
+
+        {showTaskPopup && !freedomModeActive && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+            <div
+              className={`p-8 ${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl w-1/2 max-h-[80vh] overflow-y-auto border ${theme.borderColor}`}
+            >
+              <h3 className={`text-2xl font-bold ${theme.primaryColor} mb-6 tracking-tight`}>
+                Task Management
+              </h3>
+              <div className="space-y-4 mb-6">
+                {tasks.map((task) => (
+                  <div key={task.id} className="flex items-center justify-between">
+                    <span
+                      className={
+                        task.completed
+                          ? `line-through ${theme.textColorMuted}`
+                          : `${theme.textColor} cursor-pointer`
+                      }
+                      onClick={() => setSelectedTask(task)}
+                    >
+                      {task.title} ({task.category}, {task.priority})
+                    </span>
+                    <input
+                      type="checkbox"
+                      checked={task.completed}
+                      onChange={() =>
+                        setTasks((prev) =>
+                          prev.map((t) =>
+                            t.id === task.id ? { ...t, completed: !t.completed } : t
+                          )
+                        )
+                      }
+                      className={`form-checkbox h-5 w-5 ${theme.primaryColor.replace(
+                        "text-",
+                        ""
+                      )} bg-transparent border-white/20`}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className="mb-6">
+                <input
+                  type="text"
+                  value={newTaskTitle}
+                  onChange={(e) => setNewTaskTitle(e.target.value)}
+                  placeholder="New task title"
+                  className={`p-3 bg-transparent border-b border-white/20 ${theme.textColor} w-full mb-4 placeholder-white/50 focus:outline-none focus:border-${theme.primaryColor.replace(
+                    "text-",
+                    ""
+                  )} transition-all duration-200`}
+                />
+                <select
+                  value={newTaskCategory}
+                  onChange={(e) => setNewTaskCategory(e.target.value)}
+                  className={`p-3 bg-transparent border-b border-white/20 ${theme.textColor} w-full mb-4 focus:outline-none focus:border-${theme.primaryColor.replace(
+                    "text-",
+                    ""
+                  )} transition-all duration-200`}
+                >
+                  <option>Work</option>
+                  <option>Fitness</option>
+                  <option>Personal Growth</option>
+                </select>
+                <select
+                  value={newTaskPriority}
+                  onChange={(e) => setNewTaskPriority(e.target.value)}
+                  className={`p-3 bg-transparent border-b border-white/20 ${theme.textColor} w-full mb-4 focus:outline-none focus:border-${theme.primaryColor.replace(
+                    "text-",
+                    ""
+                  )} transition-all duration-200`}
+                >
+                  <option>Low</option>
+                  <option>Medium</option>
+                  <option>High</option>
+                </select>
+                <button
+                  onClick={addTask}
+                  className={`p-3 ${theme.primaryBgLight} rounded-xl hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} w-full ${theme.primaryColor} font-semibold`}
+                >
+                  Add Task
+                </button>
+              </div>
+              <button
+                onClick={() => setShowTaskPopup(false)}
+                className={`p-3 ${theme.dangerBgLight} rounded-xl hover:${theme.dangerBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} w-full ${theme.dangerColor} font-semibold`}
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
-        <div className="flex justify-center space-x-6 mt-8">
-          <button
-            onClick={() => setShowTaskPopup(true)}
-            disabled={freedomModeActive}
-            className={`p-4 ${theme.secondaryBgLight} rounded-full hover:${theme.secondaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
-              freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            title="Manage Tasks"
-            style={
-              currentTheme === "Patriotic"
-                ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                : {}
-            }
-          >
-            <FaTasks size={22} className={theme.textColor} />
-          </button>
-          <button
-            onClick={playSpotify}
-            disabled={freedomModeActive}
-            className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
-              freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            title="Play Music"
-            style={
-              currentTheme === "Patriotic"
-                ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                : {}
-            }
-          >
-            <FaSpotify size={22} className={theme.textColor} />
-          </button>
-          {!isRunning ? (
-            <button
-              onClick={startGrind}
-              className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor}`}
-              title="Start Grinding"
-              style={
-                currentTheme === "Patriotic"
-                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                  : {}
-              }
-            >
-              <FaPlay size={22} className={theme.textColor} />
-            </button>
-          ) : isPaused ? (
-            <button
-              onClick={resumeGrind}
-              className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor}`}
-              title="Resume"
-              style={
-                currentTheme === "Patriotic"
-                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                  : {}
-              }
-            >
-              <FaPlay size={22} className={theme.textColor} />
-            </button>
-          ) : (
-            <button
-              onClick={pauseGrind}
-              className={`p-4 ${theme.warningBgLight} rounded-full hover:${theme.warningBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor}`}
-              title="Pause"
-              style={
-                currentTheme === "Patriotic"
-                  ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                  : {}
-              }
-            >
-              <FaPause size={22} className={theme.textColor} />
-            </button>
-          )}
-          <button
-            onClick={skipToNext}
-            disabled={freedomModeActive}
-            className={`p-4 ${theme.accentBgLight} rounded-full hover:${theme.accentBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
-              freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            title="Skip to Next"
-            style={
-              currentTheme === "Patriotic"
-                ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                : {}
-            }
-          >
-            <FaForward size={22} className={theme.textColor} />
-          </button>
-          <button
-            onClick={completeTask}
-            disabled={freedomModeActive}
-            className={`p-4 ${theme.primaryBgLight} rounded-full hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
-              freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            title="Complete Task"
-            style={
-              currentTheme === "Patriotic"
-                ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                : {}
-            }
-          >
-            <FaCheck size={22} className={theme.textColor} />
-          </button>
-          <button
-            onClick={() => setGrindModeActive(null)}
-            disabled={freedomModeActive}
-            className={`p-4 ${theme.dangerBgLight} rounded-full hover:${theme.dangerBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} ${
-              freedomModeActive ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-            title="Exit Grind Mode"
-            style={
-              currentTheme === "Patriotic"
-                ? { backgroundImage: `url(${trumpImage})`, backgroundSize: "cover" }
-                : {}
-            }
-          >
-            <FaTimes size={22} className={theme.textColor} />
-          </button>
-        </div>
-      </div>
 
-      {showTaskPopup && !freedomModeActive && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div
-            className={`p-8 ${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl w-1/2 max-h-[80vh] overflow-y-auto border ${theme.borderColor}`}
-          >
-            <h3 className={`text-2xl font-bold ${theme.primaryColor} mb-6 tracking-tight`}>
-              Task Management
-            </h3>
-            <div className="space-y-4 mb-6">
-              {tasks.map((task) => (
-                <div key={task.id} className="flex items-center justify-between">
-                  <span
-                    className={
-                      task.completed
-                        ? `line-through ${theme.textColorMuted}`
-                        : `${theme.textColor} cursor-pointer`
-                    }
-                    onClick={() => setSelectedTask(task)}
+        {showThemePopup && !freedomModeActive && (
+          <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+            <div
+              className={`p-8 ${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl w-1/2 max-h-[80vh] overflow-y-auto border ${theme.borderColor}`}
+            >
+              <h3 className={`text-2xl font-bold ${theme.primaryColor} mb-6 tracking-tight`}>
+                Choose Theme
+              </h3>
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                {Object.keys(themes).map((themeName) => (
+                  <button
+                    key={themeName}
+                    onClick={() => setCurrentTheme(themeName)}
+                    className={`p-4 ${
+                      currentTheme === themeName
+                        ? theme.primaryBgMedium
+                        : theme.primaryBgLight
+                    } rounded-xl hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${
+                      theme.borderColor
+                    } ${theme.textColor} font-semibold`}
                   >
-                    {task.title} ({task.category}, {task.priority})
-                  </span>
-                  <input
-                    type="checkbox"
-                    checked={task.completed}
-                    onChange={() =>
-                      setTasks((prev) =>
-                        prev.map((t) =>
-                          t.id === task.id ? { ...t, completed: !t.completed } : t
-                        )
-                      )
-                    }
-                    className={`form-checkbox h-5 w-5 ${theme.primaryColor.replace(
-                      "text-",
-                      ""
-                    )} bg-transparent border-white/20`}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="mb-6">
-              <input
-                type="text"
-                value={newTaskTitle}
-                onChange={(e) => setNewTaskTitle(e.target.value)}
-                placeholder="New task title"
-                className={`p-3 bg-transparent border-b border-white/20 ${theme.textColor} w-full mb-4 placeholder-white/50 focus:outline-none focus:border-${theme.primaryColor.replace(
-                  "text-",
-                  ""
-                )} transition-all duration-200`}
-              />
-              <select
-                value={newTaskCategory}
-                onChange={(e) => setNewTaskCategory(e.target.value)}
-                className={`p-3 bg-transparent border-b border-white/20 ${theme.textColor} w-full mb-4 focus:outline-none focus:border-${theme.primaryColor.replace(
-                  "text-",
-                  ""
-                )} transition-all duration-200`}
-              >
-                <option>Work</option>
-                <option>Fitness</option>
-                <option>Personal Growth</option>
-              </select>
-              <select
-                value={newTaskPriority}
-                onChange={(e) => setNewTaskPriority(e.target.value)}
-                className={`p-3 bg-transparent border-b border-white/20 ${theme.textColor} w-full mb-4 focus:outline-none focus:border-${theme.primaryColor.replace(
-                  "text-",
-                  ""
-                )} transition-all duration-200`}
-              >
-                <option>Low</option>
-                <option>Medium</option>
-                <option>High</option>
-              </select>
+                    {themes[themeName].name}
+                  </button>
+                ))}
+              </div>
               <button
-                onClick={addTask}
-                className={`p-3 ${theme.primaryBgLight} rounded-xl hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} w-full ${theme.primaryColor} font-semibold`}
+                onClick={() => setShowThemePopup(false)}
+                className={`p-3 ${theme.dangerBgLight} rounded-xl hover:${theme.dangerBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} w-full ${theme.dangerColor} font-semibold`}
               >
-                Add Task
+                Close
               </button>
             </div>
-            <button
-              onClick={() => setShowTaskPopup(false)}
-              className={`p-3 ${theme.dangerBgLight} rounded-xl hover:${theme.dangerBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} w-full ${theme.dangerColor} font-semibold`}
-            >
-              Close
-            </button>
           </div>
-        </div>
-      )}
-
-      {showThemePopup && !freedomModeActive && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div
-            className={`p-8 ${theme.cardBg} backdrop-blur-xl rounded-2xl shadow-2xl w-1/2 max-h-[80vh] overflow-y-auto border ${theme.borderColor}`}
-          >
-            <h3 className={`text-2xl font-bold ${theme.primaryColor} mb-6 tracking-tight`}>
-              Choose Theme
-            </h3>
-            <div className="grid grid-cols-2 gap-4 mb-6">
-              {Object.keys(themes).map((themeName) => (
-                <button
-                  key={themeName}
-                  onClick={() => setCurrentTheme(themeName)}
-                  className={`p-4 ${
-                    currentTheme === themeName
-                      ? theme.primaryBgMedium
-                      : theme.primaryBgLight
-                  } rounded-xl hover:${theme.primaryBgMedium} transition-all duration-200 backdrop-blur-md border ${
-                    theme.borderColor
-                  } ${theme.textColor} font-semibold`}
-                >
-                  {themes[themeName].name}
-                </button>
-              ))}
-            </div>
-            <button
-              onClick={() => setShowThemePopup(false)}
-              className={`p-3 ${theme.dangerBgLight} rounded-xl hover:${theme.dangerBgMedium} transition-all duration-200 backdrop-blur-md border ${theme.borderColor} w-full ${theme.dangerColor} font-semibold`}
-            >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </>
   );
 };
 
