@@ -235,22 +235,8 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
   };
 
   useEffect(() => {
-    if (!isRunning && mode && timeLeft === 0) {
-      setTimeLeft(modes[mode].work);
-    }
-    if (mode === "Freedom" && isRunning && !isPaused && currentPeriod === "work") {
-      setFreedomModeActive(true);
-      // Attempt to prevent navigation (limited effectiveness)
-      window.onbeforeunload = () => "Freedom mode is active! Are you sure you want to leave?";
-    } else {
-      setFreedomModeActive(false);
-      window.onbeforeunload = null; // Remove navigation warning during breaks or other modes
-    }
-  }, [mode, isRunning, isPaused, timeLeft, currentPeriod]);
-
-  useEffect(() => {
     if (!isRunning || isPaused || !mode) return;
-
+  
     const timer = setInterval(() => {
       setTimeLeft((prev) => {
         if (prev <= 0) {
@@ -270,17 +256,25 @@ const GrindMode = ({ selectedTask: initialTask, setGrindModeActive }) => {
         if (currentPeriod === "work" && selectedTask) {
           setTasks((prev) =>
             prev.map((t) =>
-              t.id === selectedTask.id ? { ...t, timeSpent: (t.timeSpent || 0) + 1 } : t
+              t.id === selectedTask.id
+                ? {
+                    ...t,
+                    timeSpent: (t.timeSpent || 0) + 1,
+                    sessions: [
+                      ...(t.sessions || []),
+                      { timestamp: new Date().toISOString(), duration: 1 },
+                    ],
+                  }
+                : t
             )
           );
         }
         return prev - 1;
       });
     }, 1000);
-
+  
     return () => clearInterval(timer);
   }, [isRunning, isPaused, timeLeft, mode, currentSession, sessions, currentPeriod, selectedTask, setTasks]);
-
   const startGrind = () => {
     if (!mode) return;
     if (timeLeft === 0) setTimeLeft(modes[mode].work);

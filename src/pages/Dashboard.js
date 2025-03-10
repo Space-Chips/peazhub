@@ -13,9 +13,12 @@ const Dashboard = () => {
   const totalTasks = tasks.length;
   const totalTimeSpentToday = tasks.reduce((sum, task) => {
     const today = new Date().toDateString();
-    const taskTime = task.timeSpent || 0;
-    // Assume timeSpent is in seconds; we'll filter for today in a real app with timestamps
-    return sum + taskTime;
+    const taskSessions = task.sessions || [];
+    const todaySessions = taskSessions.filter(
+      (session) => new Date(session.timestamp).toDateString() === today
+    );
+    const todayTime = todaySessions.reduce((sessionSum, session) => sessionSum + session.duration, 0);
+    return sum + todayTime;
   }, 0);
   const dailyGoal = 8 * 3600; // 8 hours as a sample daily goal
   const progress = (totalTimeSpentToday / dailyGoal) * 100;
